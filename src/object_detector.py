@@ -1,14 +1,26 @@
-import sys
 import nltk.data
 import xml.etree.ElementTree as ET
 import itertools
 
 class NamedObject(object):
-    def __init__(self):
-        self.names = []
+    def __init__(self, name):
+        self.names = set((name,))
 
-    def is_disjoint(self, another):
-        pass
+    def union(self, another):
+        self.names = self.names.union(another.names)
+
+    def intersects(self, another):
+
+        def create_set(lst):
+            ret = set()
+            for l in lst:
+                ret.update(l)
+            return ret
+
+        return len(create_set(self.names).intersection(create_set(another.names))) > 0
+
+    def __repr__(self):
+        return str(self.__class__) + str(self.names)
 
     def add(self, name):
         self.names.append(name)
@@ -20,18 +32,12 @@ class Person(NamedObject):
     def __str__(self):
         print("Person: ".join(str(self.names)))
 
-    def dict_index(self):
-        return 1
-
 class Location(NamedObject):
     def __init__(self):
         NamedObject.__init__(self)
 
     def __str__(self):
         print("Location: ".join(str(self.names)))
-
-    def dict_index(self):
-        return 0
 
 def load_dictionary(filename):
     with open(filename) as dict_src:
@@ -57,7 +63,7 @@ def find_proper(sents):
 
     def find_capitalize_words(tokens):
         ret = []
-        for k, g in itertools.groupby(tokens,key = lambda s : s[0].isupper()):
+        for k, g in itertools.groupby(tokens,key=lambda s:s[0].isupper()):
             if k:
                 ret.append(tuple(g))
         return ret
@@ -67,6 +73,18 @@ def find_proper(sents):
         tokens = nltk.word_tokenize(sent)
         propers.extend(find_capitalize_words(tokens[1:]))
     return list(set(propers))
+
+def reduce_propers(propers):
+    result = []
+
+    while len(propers) > 0:
+        named_object = propers.pop()
+        for another in propers[1:]:
+            if named_object.intersects(another):
+                named_object.union(another)
+                propers.remove(another)
+        result.append(named_object)
+    return result
 
 def analyze_propers(propers):
     return 1, 3
@@ -80,13 +98,13 @@ if __name__ == "__main__":
 
     i = 1
     datasets = []
-    while(params[i]):
+    while params[i]:
         datasets.append(params[i])
         i += 1
     i += 1
 
     dictionaries = []
-    while(params[i] or i == len(params)):
+    while params[i] or i == len(params):
         dictionaries.append(params[i].strip())
         i += 1
 
@@ -100,8 +118,15 @@ if __name__ == "__main__":
     directionprep_dictionary = load_dictionary(dictionaries[2])
     stopwords = load_dictionary(dictionaries[3])
 
-    propers = sorted(find_proper(sents), key = lambda x : -len(x))
-    propers = [NamedObject(x) for x in propers]
+    print(stopwords)
+
+    dictionaries = {
+        Location.__class__ : places_dictionary,
+        Person.__class__ : personality_dictionary
+    }
+
+    propers = sorted(find_proper(sents), key=lambda x:-len(x))
+    propers = reduce_propers([NamedObject(x) for x in propers])
 
     persons, locations = analyze_propers(propers)
     print("\n".join(str(y) for y in propers))
