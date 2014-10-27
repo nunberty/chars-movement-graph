@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<FictionBook xmlns="http://www.gribuser.ru/xml/fictionbook/2.0" xmlns:xlink="http://www.w3.org/1999/xlink">
+<FictionBook xmlns:xhtml="http://www.gribuser.ru/xml/fictionbook/2.0" xmlns:xlink="http://www.w3.org/1999/xlink">
     <description>
         <title-info>
             <genre>antique</genre>
@@ -8,7 +8,7 @@
             <coverpage><image xlink:href="#_0.jpg" /></coverpage>
             <lang>en</lang>
             <keywords>pre-intermediate</keywords>
-            
+
         </title-info>
         <document-info>
             <author><first-name>Edgar</first-name><middle-name>Allan</middle-name><last-name>Poe</last-name></author>
@@ -20,7 +20,7 @@
         <publish-info>
             <year>0101</year>
             <publisher>english-e-books.net</publisher>
-            
+
         </publish-info>
     </description>
 <body>
@@ -1170,4 +1170,4 @@ JXzgUiQ6OAHdX0oPjRh24ZSJWsDzqrWyVJ/KDNPc/pc6ijRmaLP2XucyajE+fg0T+kvKlvR
 uWPmPTCchGewJ99Fb0hfB66uLtj0Sqby2BVrZpVTZTJRbrDQTU3G/2rWlY4RyR7OHnn9o1B
 cumlI3W1SZ+lR9tbeGwmfxiW+sWQAlA1UonAxoOZJwJr/9k=
 </binary>
-</FictionBook> 
+</FictionBook>

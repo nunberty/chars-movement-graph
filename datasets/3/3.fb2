@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<FictionBook xmlns="http://www.gribuser.ru/xml/fictionbook/2.0" xmlns:xlink="http://www.w3.org/1999/xlink">
+<FictionBook xmlns:xhtml="http://www.gribuser.ru/xml/fictionbook/2.0" xmlns:xlink="http://www.w3.org/1999/xlink">
     <description>
         <title-info>
             <genre>antique</genre>
@@ -8,7 +8,7 @@
             <coverpage><image xlink:href="#_0.jpg" /></coverpage>
             <lang>en</lang>
             <keywords>elementary</keywords>
-            
+
         </title-info>
         <document-info>
             <author><first-name>Jennifer</first-name><last-name>Bassett</last-name></author>
@@ -20,7 +20,7 @@
         <publish-info>
             <year>0101</year>
             <publisher>english-e-books.net</publisher>
-            
+
         </publish-info>
     </description>
 <body>
@@ -788,4 +788,4 @@ oopEIKevSiitE2Kew7PNPD89/zoorZamK1H+Yv+TR5o9KKKe4WHrMAego80k9P1ooo5miXF
 XuSLK277233FSNcN5jRrMZI8YVj6denbmiimpNsSSKbSZ71HuP/AOqiiobZWxJ5mVyTzUe4
 0UUm9BjQ375WXK85yOtEjbj1LepPU0UVDbsdFkR0UUVkSFFFFAH/2Q==
 </binary>
-</FictionBook> 
+</FictionBook>
