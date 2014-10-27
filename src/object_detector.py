@@ -71,7 +71,9 @@ def find_proper(sents):
         ret = []
         for k, g in itertools.groupby(tokens,key=lambda s:s[0].isupper()):
             if k:
-                ret.append(tuple(g))
+                g = tuple(g)
+                if not any(word.lower() in stopwords for word in g):
+                    ret.append(tuple(g))
         return ret
 
     propers = []
