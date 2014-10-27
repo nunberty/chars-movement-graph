@@ -11,20 +11,22 @@ class NamedObject(object):
         self.names = self.names.union(another.names)
 
     def intersects(self, another):
+        return len(self._create_set().intersection(another._create_set())) > 0
 
-        def create_set(lst):
-            ret = set()
-            for l in lst:
-                ret.update(l)
-            return ret
-
-        return len(create_set(self.names).intersection(create_set(another.names))) > 0
+    def words_set(self):
+        return self._create_set()
 
     def __repr__(self):
         return "NamedObject: " + str(self.names)
 
     def __str__(self):
         return self.__repr__()
+
+    def _create_set(self):
+        ret = set()
+        for l in self.names:
+            ret.update(l)
+        return ret
 
 class Person(NamedObject):
     def __init__(self):
@@ -36,6 +38,10 @@ class Person(NamedObject):
     def __str__(self):
         return self.__repr__()
 
+    @staticmethod
+    def reinterpret(self, named_object):
+        return Person(named_object.names)
+
 class Location(NamedObject):
     def __init__(self):
         NamedObject.__init__(self)
@@ -45,6 +51,10 @@ class Location(NamedObject):
 
     def __str__(self):
         return self.__repr__()
+
+    @staticmethod
+    def reinterpret(self, named_object):
+        return Location(named_object.names)
 
 def load_dictionary(filename):
     with open(filename) as dict_src:
@@ -66,7 +76,7 @@ def get_enumerate_sents(tree):
 
     return enumerate(sents)
 
-def reduce_propers(sents, stopwords):
+def find_propers(sents, stopwords):
 
     def find_proper(sents):
 
@@ -103,8 +113,9 @@ def analyze(sents, dictionaries):
     directionprep_dictionary = load_dictionary(dictionaries[2])
     stopwords = load_dictionary(dictionaries[3])
 
-    propers = reduce_propers(sents, stopwords)
-    return propers
+    named_objects = find_propers(sents, stopwords)
+
+    return named_objects
 
 def gether_statistic(data, propers):
     pass
