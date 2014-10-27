@@ -250,3 +250,4 @@ friar
 baron
 bishop
 earl
+friar
