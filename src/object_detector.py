@@ -115,6 +115,18 @@ def analyze(sents, dictionaries):
 
     named_objects = find_propers(sents, stopwords)
 
+    ret = []
+    for named_object in named_objects:
+        words_set = named_object.words_set()
+        if len(words_set.intersection(personality_dictionary)) > 0:
+            ret.append(Person.reinterpret(named_object))
+            named_objects.remove(named_object)
+
+        if len(words_set.intersection(places_dictionary)) > 0:
+            ret.append(Location.reinterpret(named_object))
+            named_objects.remove(named_object)
+
+    print(ret)
     return named_objects
 
 def gether_statistic(data, propers):
