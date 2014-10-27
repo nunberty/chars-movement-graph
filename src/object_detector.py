@@ -20,12 +20,18 @@ class Person(NamedObject):
     def __str__(self):
         print("Person: ".join(str(self.names)))
 
+    def dict_index(self):
+        return 1
+
 class Location(NamedObject):
     def __init__(self):
         NamedObject.__init__(self)
 
     def __str__(self):
         print("Location: ".join(str(self.names)))
+
+    def dict_index(self):
+        return 0
 
 def load_dictionary(filename):
     with open(filename) as dict_src:
@@ -51,11 +57,10 @@ def find_proper(sents):
 
     def find_capitalize_words(tokens):
         ret = []
-        for t in tokens:
-            for k, g in itertools.groupby(tokens,key = lambda s : s[0].isupper()):
-                if k:
-                    ret.append(tuple(g))
-        return ret;
+        for k, g in itertools.groupby(tokens,key = lambda s : s[0].isupper()):
+            if k:
+                ret.append(tuple(g))
+        return ret
 
     propers = []
     for i, sent in sents:
@@ -69,16 +74,33 @@ def analyze_propers(propers):
 def gether_statistic(data, propers):
     pass
 
-# Will be script parameter
-filename = "../datasets/1/1.fb2"
+if __name__ == "__main__":
+    with open("paths") as params_file:
+        params = params_file.read().splitlines()
 
-tree = parse_fb2(filename)
-sents = get_enumerate_sents(tree)
+    i = 1
+    datasets = []
+    while(params[i]):
+        datasets.append(params[i])
+        i += 1
+    i += 1
 
-places_dictionary = load_dictionary("../dictionaries/places.txt")
-personality_dictionary = load_dictionary("../dictionaries/professions.txt")
+    dictionaries = []
+    while(params[i] or i == len(params)):
+        dictionaries.append(params[i].strip())
+        i += 1
 
-propers = sorted(find_proper(sents), key = lambda x : -1 * len(x))
+    filename = datasets[0]
 
-persons, locations = analyze_propers(propers)
-print("\n".join(str(y) for y in propers))
+    tree = parse_fb2(filename)
+    sents = get_enumerate_sents(tree)
+
+    places_dictionary = load_dictionary(dictionaries[0])
+    personality_dictionary = load_dictionary(dictionaries[1])
+    directionprep_dictionary = load_dictionary(dictionaries[2])
+
+    propers = sorted(find_proper(sents), key = lambda x : -len(x))
+    propers = [NamedObject(x) for x in propers]
+
+    persons, locations = analyze_propers(propers)
+    print("\n".join(str(y) for y in propers))
