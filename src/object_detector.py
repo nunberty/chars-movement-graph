@@ -20,24 +20,30 @@ class NamedObject(object):
         return len(create_set(self.names).intersection(create_set(another.names))) > 0
 
     def __repr__(self):
-        return str(self.__class__) + str(self.names)
+        return "NamedObject: " + str(self.names)
 
-    def add(self, name):
-        self.names.append(name)
+    def __str__(self):
+        return self.__repr__()
 
 class Person(NamedObject):
     def __init__(self):
         NamedObject.__init__(self)
 
+    def __repr__(self):
+        return "Person: " + str(self.names)
+
     def __str__(self):
-        print("Person: ".join(str(self.names)))
+        return self.__repr__()
 
 class Location(NamedObject):
     def __init__(self):
         NamedObject.__init__(self)
 
+    def __repr__(self):
+        return "Location: " + str(self.names)
+
     def __str__(self):
-        print("Location: ".join(str(self.names)))
+        return self.__repr__()
 
 def load_dictionary(filename):
     with open(filename) as dict_src:
@@ -117,8 +123,6 @@ if __name__ == "__main__":
     personality_dictionary = load_dictionary(dictionaries[1])
     directionprep_dictionary = load_dictionary(dictionaries[2])
     stopwords = load_dictionary(dictionaries[3])
-
-    print(stopwords)
 
     dictionaries = {
         Location.__class__ : places_dictionary,
