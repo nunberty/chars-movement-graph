@@ -98,6 +98,7 @@ if __name__ == "__main__":
     places_dictionary = load_dictionary(dictionaries[0])
     personality_dictionary = load_dictionary(dictionaries[1])
     directionprep_dictionary = load_dictionary(dictionaries[2])
+    stopwords = load_dictionary(dictionaries[3])
 
     propers = sorted(find_proper(sents), key = lambda x : -len(x))
     propers = [NamedObject(x) for x in propers]
