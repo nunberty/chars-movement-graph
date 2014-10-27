@@ -1,6 +1,7 @@
 import nltk.data
 import xml.etree.ElementTree as ET
 import itertools
+import sys
 
 class NamedObject(object):
     def __init__(self, name):
@@ -65,24 +66,26 @@ def get_enumerate_sents(tree):
 
     return enumerate(sents)
 
-def find_proper(sents):
+def reduce_propers(sents, stopwords):
 
-    def find_capitalize_words(tokens):
-        ret = []
-        for k, g in itertools.groupby(tokens,key=lambda s:s[0].isupper()):
-            if k:
-                group = tuple(g)
-                if not any(word.lower() in stopwords for word in group):
-                    ret.append(group)
-        return ret
+    def find_proper(sents):
 
-    propers = []
-    for i, sent in sents:
-        tokens = nltk.word_tokenize(sent)
-        propers.extend(find_capitalize_words(tokens[1:]))
-    return list(set(propers))
+        def find_capitalize_words(tokens):
+            ret = []
+            for k, g in itertools.groupby(tokens,key=lambda s:s[0].isupper()):
+                if k:
+                    group = tuple(g)
+                    if not any(word.lower() in stopwords for word in group):
+                        ret.append(group)
+            return ret
 
-def reduce_propers(propers):
+        propers = []
+        for i, sent in sents:
+            tokens = nltk.word_tokenize(sent)
+            propers.extend(find_capitalize_words(tokens[1:]))
+        return set(propers)
+
+    propers = [NamedObject(x) for x in sorted(find_proper(sents), key=lambda x:-len(x))]
     result = []
 
     while len(propers) > 0:
@@ -94,8 +97,14 @@ def reduce_propers(propers):
         result.append(named_object)
     return result
 
-def analyze_propers(propers):
-    return 1, 3
+def analyze(sents, dictionaries):
+    places_dictionary = load_dictionary(dictionaries[0])
+    personality_dictionary = load_dictionary(dictionaries[1])
+    directionprep_dictionary = load_dictionary(dictionaries[2])
+    stopwords = load_dictionary(dictionaries[3])
+
+    propers = reduce_propers(sents, stopwords)
+    return propers
 
 def gether_statistic(data, propers):
     pass
@@ -116,23 +125,11 @@ if __name__ == "__main__":
         dictionaries.append(params[i].strip())
         i += 1
 
-    filename = datasets[0]
+    filename = datasets[int(sys.argv[1])]
 
     tree = parse_fb2(filename)
     sents = get_enumerate_sents(tree)
 
-    places_dictionary = load_dictionary(dictionaries[0])
-    personality_dictionary = load_dictionary(dictionaries[1])
-    directionprep_dictionary = load_dictionary(dictionaries[2])
-    stopwords = load_dictionary(dictionaries[3])
+    named_objects =  analyze(sents, dictionaries)
 
-    dictionaries = {
-        Location.__class__ : places_dictionary,
-        Person.__class__ : personality_dictionary
-    }
-
-    propers = sorted(find_proper(sents), key=lambda x:-len(x))
-    propers = reduce_propers([NamedObject(x) for x in propers])
-
-    persons, locations = analyze_propers(propers)
-    print("\n".join(str(y) for y in propers))
+    print("\n".join(str(no) for no in named_objects))
