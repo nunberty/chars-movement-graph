@@ -4,11 +4,13 @@ import itertools
 import sys
 
 class NamedObject(object):
-    def __init__(self, name):
+    def __init__(self, name, coordinate):
+        self.coordinates = set((coordinate,))
         self.names = set((name,))
 
     def union(self, another):
         self.names = self.names.union(another.names)
+        self.coordinates = self.coordinates.union(another.coordinates)
 
     def intersects(self, another):
         return len(self._create_set().intersection(another._create_set())) > 0
@@ -17,7 +19,7 @@ class NamedObject(object):
         return self._create_set()
 
     def __repr__(self):
-        return "NamedObject: " + str(self.names)
+        return "NamedObject: " + str(self.names)  + str(self.coordinates)
 
     def __str__(self):
         return self.__repr__()
@@ -29,32 +31,34 @@ class NamedObject(object):
         return ret
 
 class Person(NamedObject):
-    def __init__(self):
-        NamedObject.__init__(self)
+    def __init__(self, name=None, coordinate=None):
+        self.coordinates = set()
+        if coordinate:
+            self.coordinates.update((coordinate,))
+        self.names = set()
+        if name:
+            self.names.add((name,))
 
     def __repr__(self):
-        return "Person: " + str(self.names)
+        return "Person: " + str(self.names) + str(self.coordinates)
 
     def __str__(self):
         return self.__repr__()
-
-    @staticmethod
-    def reinterpret(self, named_object):
-        return Person(named_object.names)
 
 class Location(NamedObject):
-    def __init__(self):
-        NamedObject.__init__(self)
+    def __init__(self, name=None, coordinate=None):
+        self.coordinates = set()
+        if coordinate:
+            self.coordinates.update((coordinate,))
+        self.names = set()
+        if name:
+            self.names.add((name,))
 
     def __repr__(self):
-        return "Location: " + str(self.names)
+        return "Location: " + str(self.names) + str(self.coordinates)
 
     def __str__(self):
         return self.__repr__()
-
-    @staticmethod
-    def reinterpret(self, named_object):
-        return Location(named_object.names)
 
 def load_dictionary(filename):
     with open(filename) as dict_src:
@@ -86,7 +90,7 @@ def find_propers(sents, stopwords):
                 if k:
                     group = tuple(g)
                     if not any(word.lower() in stopwords for word in group):
-                        ret.append(group)
+                        ret.append((i, group))
             return ret
 
         propers = []
@@ -95,7 +99,7 @@ def find_propers(sents, stopwords):
             propers.extend(find_capitalize_words(tokens[1:]))
         return set(propers)
 
-    propers = [NamedObject(x) for x in sorted(find_proper(sents), key=lambda x:-len(x))]
+    propers = [NamedObject(x, i) for i, x in sorted(find_proper(sents), key=lambda x:-len(x))]
     result = []
 
     while len(propers) > 0:
@@ -108,6 +112,7 @@ def find_propers(sents, stopwords):
     return result
 
 def analyze(sents, dictionaries):
+
     places_dictionary = load_dictionary(dictionaries[0])
     personality_dictionary = load_dictionary(dictionaries[1])
     directionprep_dictionary = load_dictionary(dictionaries[2])
@@ -115,18 +120,25 @@ def analyze(sents, dictionaries):
 
     named_objects = find_propers(sents, stopwords)
 
+    print("\n".join(str(x) for x in named_objects))
+
     ret = []
     for named_object in named_objects:
-        words_set = named_object.words_set()
+        words_set = set(x.lower() for x in named_object.words_set())
         if len(words_set.intersection(personality_dictionary)) > 0:
-            ret.append(Person.reinterpret(named_object))
+            person = Person()
+            person.names.update(named_object.names)
+            person.coordinates.update(named_object.coordinates)
+            ret.append(person)
             named_objects.remove(named_object)
 
         if len(words_set.intersection(places_dictionary)) > 0:
-            ret.append(Location.reinterpret(named_object))
+            location = Location()
+            location.names.update(named_object.names)
+            location.coordinates.update(named_object.coordinates)
+            ret.append(location)
             named_objects.remove(named_object)
 
-    print(ret)
     return named_objects
 
 def gether_statistic(data, propers):
