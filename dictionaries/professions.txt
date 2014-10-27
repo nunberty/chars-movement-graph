@@ -249,3 +249,4 @@ sheriff
 friar
 baron
 bishop
+earl
