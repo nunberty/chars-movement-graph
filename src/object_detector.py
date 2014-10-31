@@ -3,6 +3,8 @@ import xml.etree.ElementTree as ET
 import itertools
 import sys
 
+from paths import ds1,places_path,profs_path,preps_path, stop_path
+
 class NamedObject(object):
     def __init__(self, name, coordinate):
         self.coordinates = set((coordinate,))
@@ -120,8 +122,6 @@ def analyze(sents, dictionaries):
 
     named_objects = find_propers(sents, stopwords)
 
-    print("\n".join(str(x) for x in named_objects))
-
     ret = []
     for named_object in named_objects:
         words_set = set(x.lower() for x in named_object.words_set())
@@ -139,32 +139,19 @@ def analyze(sents, dictionaries):
             ret.append(location)
             named_objects.remove(named_object)
 
+    print("\n".join(str(x) for x in ret))
+
     return named_objects
 
 def gether_statistic(data, propers):
     pass
 
+
 if __name__ == "__main__":
-    with open("paths") as params_file:
-        params = params_file.read().splitlines()
-
-    i = 1
-    datasets = []
-    while params[i]:
-        datasets.append(params[i])
-        i += 1
-    i += 1
-
-    dictionaries = []
-    while params[i] or i == len(params):
-        dictionaries.append(params[i].strip())
-        i += 1
-
-    filename = datasets[int(sys.argv[1])]
+    dictionaries = [places_path, profs_path, preps_path, stop_path]
+    filename = ds1
 
     tree = parse_fb2(filename)
     sents = get_enumerate_sents(tree)
 
     named_objects =  analyze(sents, dictionaries)
-
-    print("\n".join(str(no) for no in named_objects))
