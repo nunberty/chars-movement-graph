@@ -2,66 +2,10 @@ import sys
 import paths
 import itertools
 import text_utils
-
-class NamedObject(object):
-    def __init__(self, name, coordinate):
-        self.coordinates = set((coordinate,))
-        self.names = set((name,))
-
-    def union(self, another):
-        self.names = self.names.union(another.names)
-        self.coordinates = self.coordinates.union(another.coordinates)
-
-    def intersects(self, another):
-        return len(self._create_set().intersection(another._create_set())) > 0
-
-    def words_set(self):
-        return self._create_set()
-
-    def __repr__(self):
-        return "NamedObject: {}, {}".format(str(self.names), str(self.coordinates))
-
-    def __str__(self):
-        return self.__repr__()
-
-    def _create_set(self):
-        ret = set()
-        for l in self.names:
-            ret.update(l)
-        return ret
-
-class Person(NamedObject):
-    def __init__(self, name=None, coordinate=None):
-        self.coordinates = set()
-        if coordinate:
-            self.coordinates.update((coordinate,))
-        self.names = set()
-        if name:
-            self.names.add((name,))
-
-    def __repr__(self):
-        return "Person: {}, {}".format(str(self.names), str(self.coordinates))
-
-    def __str__(self):
-        return self.__repr__()
-
-class Location(NamedObject):
-    def __init__(self, name=None, coordinate=None):
-        self.coordinates = set()
-        if coordinate:
-            self.coordinates.update((coordinate,))
-        self.names = set()
-        if name:
-            self.names.add((name,))
-
-    def __repr__(self):
-        return "Location: {},{}".format(str(self.names), str(self.coordinates))
-
-    def __str__(self):
-        return self.__repr__()
+import model
 
 def find_propers(sents):
-    propers = [NamedObject(x, i) for i, x in sorted(text_utils.find_proper(sents), key=lambda x:-len(x))]
+    propers = [model.NamedObject(x, i) for i, x in sorted(text_utils.find_proper(sents), key=lambda x:-len(x))]
     result = []
 
     while propers:
@@ -86,9 +30,9 @@ def analyze(sents, dictionaries):
         words_set = {x.lower() for x in named_object.words_set()}
         things = []
         if words_set.intersection(personality_dictionary):
-            things.append(Person())
+            things.append(model.Person())
         if words_set.intersection(places_dictionary):
-            things.append(Location())
+            things.append(model.Location())
 
         for thing in things:
             thing.names.update(named_object.names)
