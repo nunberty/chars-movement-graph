@@ -1,5 +1,6 @@
 import sys
 import paths
+import itertools
 import text_utils
 
 class NamedObject(object):
@@ -95,6 +96,20 @@ def analyze(sents, dictionaries):
             ret.append(thing)
             named_objects.remove(named_object)
 
+    for named_object in named_objects:
+        print("CO")
+        print(named_object.coordinates)
+        sentences = [s for s in sents if s[0] in named_object.coordinates]
+        print(" ".join(str(x) for x in sentences))
+        for i, s in sentences:
+            for name in named_object.names:
+                if text_utils.get_word_before(s, " ".join(x for x in name)) in directionprep_dictionary:
+                    thing = Location()
+                    thing.names.update(named_object.names)
+                    thing.coordinates.update(named_object.coordinates)
+                    ret.append(thing)
+                    named_objects.remove(named_object)
+
     print("\n".join(str(x) for x in ret))
 
     return named_objects
@@ -107,6 +122,6 @@ if __name__ == "__main__":
     filename = paths.ds1
 
     tree = text_utils.parse_fb2(filename)
-    sents = text_utils.get_enumerate_sents(tree)
+    sents = text_utils.get_sents(tree)
 
-    named_objects =  analyze(sents, dictionaries)
+    named_objects = analyze(sents, dictionaries)

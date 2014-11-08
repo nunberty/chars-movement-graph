@@ -2,7 +2,7 @@ import xml.etree.ElementTree as ET
 import nltk.data
 import itertools
 
-from paths import stop_path
+from paths import stop_path, english_pickle
 
 def load_dictionary(filename):
     with open(filename) as dict_src:
@@ -14,15 +14,15 @@ def load_dictionary(filename):
 def parse_fb2(source):
     return ET.parse(source)
 
-def get_enumerate_sents(tree):
-    sent_detector = nltk.data.load('tokenizers/punkt/english.pickle')
+def get_sents(tree):
+    sent_detector = nltk.data.load(english_pickle)
     sents = []
     for body in tree.find('body'):
         for p in body.findall('p'):
             if p.text:
                 sents.extend(sent_detector.tokenize(p.text.strip()))
 
-    return enumerate(sents)
+    return sents
 
 def find_proper(sents):
 
@@ -37,7 +37,13 @@ def find_proper(sents):
         return ret
 
     propers = []
-    for i, sent in sents:
+    for i, sent in enumerate(sents):
         tokens = nltk.word_tokenize(sent)
         propers.extend(find_capitalize_words(tokens[1:]))
     return set(propers)
+
+def get_word_before(string, substring):
+    if substring in string:
+        index = string.find(substring)
+        string = string[0:index].strip()
+        return string.split()[-1]
