@@ -1,9 +1,6 @@
-import nltk.data
-import xml.etree.ElementTree as ET
-import itertools
 import sys
-
-from paths import ds1,places_path,profs_path,preps_path, stop_path
+import paths
+import text_utils
 
 class NamedObject(object):
     def __init__(self, name, coordinate):
@@ -21,7 +18,7 @@ class NamedObject(object):
         return self._create_set()
 
     def __repr__(self):
-        return "NamedObject: " + str(self.names)  + str(self.coordinates)
+        return "NamedObject: {}, {}".format(str(self.names), str(self.coordinates))
 
     def __str__(self):
         return self.__repr__()
@@ -42,7 +39,7 @@ class Person(NamedObject):
             self.names.add((name,))
 
     def __repr__(self):
-        return "Person: " + str(self.names) + str(self.coordinates)
+        return "Person: {}, {}".format(str(self.names), str(self.coordinates))
 
     def __str__(self):
         return self.__repr__()
@@ -57,54 +54,16 @@ class Location(NamedObject):
             self.names.add((name,))
 
     def __repr__(self):
-        return "Location: " + str(self.names) + str(self.coordinates)
+        return "Location: {},{}".format(str(self.names), str(self.coordinates))
 
     def __str__(self):
         return self.__repr__()
 
-def load_dictionary(filename):
-    with open(filename) as dict_src:
-        data = dict_src.read()
-
-    ret = set(data.splitlines())
-    return ret
-
-def parse_fb2(source):
-    return ET.parse(source)
-
-def get_enumerate_sents(tree):
-    sent_detector = nltk.data.load('tokenizers/punkt/english.pickle')
-    sents = []
-    for body in tree.find('body'):
-        for p in body.findall('p'):
-            if p.text:
-                sents.extend(sent_detector.tokenize(p.text.strip()))
-
-    return enumerate(sents)
-
-def find_propers(sents, stopwords):
-
-    def find_proper(sents):
-
-        def find_capitalize_words(tokens):
-            ret = []
-            for k, g in itertools.groupby(tokens,key=lambda s:s[0].isupper()):
-                if k:
-                    group = tuple(g)
-                    if not any(word.lower() in stopwords for word in group):
-                        ret.append((i, group))
-            return ret
-
-        propers = []
-        for i, sent in sents:
-            tokens = nltk.word_tokenize(sent)
-            propers.extend(find_capitalize_words(tokens[1:]))
-        return set(propers)
-
-    propers = [NamedObject(x, i) for i, x in sorted(find_proper(sents), key=lambda x:-len(x))]
+def find_propers(sents):
+    propers = [NamedObject(x, i) for i, x in sorted(text_utils.find_proper(sents), key=lambda x:-len(x))]
     result = []
 
-    while len(propers) > 0:
+    while propers:
         named_object = propers.pop()
         for another in propers[1:]:
             if named_object.intersects(another):
@@ -115,12 +74,11 @@ def find_propers(sents, stopwords):
 
 def analyze(sents, dictionaries):
 
-    places_dictionary = load_dictionary(dictionaries[0])
-    personality_dictionary = load_dictionary(dictionaries[1])
-    directionprep_dictionary = load_dictionary(dictionaries[2])
-    stopwords = load_dictionary(dictionaries[3])
+    places_dictionary = text_utils.load_dictionary(dictionaries[0])
+    personality_dictionary = text_utils.load_dictionary(dictionaries[1])
+    directionprep_dictionary = text_utils.load_dictionary(dictionaries[2])
 
-    named_objects = find_propers(sents, stopwords)
+    named_objects = find_propers(sents)
 
     ret = []
     for named_object in named_objects:
@@ -148,10 +106,10 @@ def gether_statistic(data, propers):
 
 
 if __name__ == "__main__":
-    dictionaries = [places_path, profs_path, preps_path, stop_path]
-    filename = ds1
+    dictionaries = [paths.places_path, paths.profs_path, paths.preps_path]
+    filename = paths.ds1
 
-    tree = parse_fb2(filename)
-    sents = get_enumerate_sents(tree)
+    tree = text_utils.parse_fb2(filename)
+    sents = text_utils.get_enumerate_sents(tree)
 
     named_objects =  analyze(sents, dictionaries)
