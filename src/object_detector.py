@@ -82,19 +82,17 @@ def analyze(sents, dictionaries):
 
     ret = []
     for named_object in named_objects:
-        words_set = set(x.lower() for x in named_object.words_set())
-        if len(words_set.intersection(personality_dictionary)) > 0:
-            person = Person()
-            person.names.update(named_object.names)
-            person.coordinates.update(named_object.coordinates)
-            ret.append(person)
-            named_objects.remove(named_object)
+        words_set = {x.lower() for x in named_object.words_set()}
+        things = []
+        if words_set.intersection(personality_dictionary):
+            things.append(Person())
+        if words_set.intersection(places_dictionary):
+            things.append(Location())
 
-        if len(words_set.intersection(places_dictionary)) > 0:
-            location = Location()
-            location.names.update(named_object.names)
-            location.coordinates.update(named_object.coordinates)
-            ret.append(location)
+        for thing in things:
+            thing.names.update(named_object.names)
+            thing.coordinates.update(named_object.coordinates)
+            ret.append(thing)
             named_objects.remove(named_object)
 
     print("\n".join(str(x) for x in ret))
@@ -103,7 +101,6 @@ def analyze(sents, dictionaries):
 
 def gether_statistic(data, propers):
     pass
-
 
 if __name__ == "__main__":
     dictionaries = [paths.places_path, paths.profs_path, paths.preps_path]
