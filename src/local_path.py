@@ -1,2 +1,2 @@
 # absolute path to project
-prefix = ''
+prefix = '/home/alina/Studyspace/AU/NIR/chars-movement-graph'

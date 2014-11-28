@@ -1,3 +1,4 @@
 graph/*
 src/__pycache__/*
 src/local_path.py
+src/foo.py

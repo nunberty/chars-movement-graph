@@ -4,18 +4,21 @@ import itertools
 import text_utils
 import model
 
-def find_propers(sents):
-    propers = [model.NamedObject(x, i) for i, x in sorted(text_utils.find_proper(sents), key=lambda x:-len(x))]
-    result = []
+def reduce_propers(propers):
+    copy = propers[:]
+    result = set()
 
     while propers:
         named_object = propers.pop()
-        for another in propers[1:]:
-            if named_object.intersects(another):
+        for another in copy:
+            if named_object.names.intersect(another.n):
                 named_object.union(another)
-                propers.remove(another)
-        result.append(named_object)
-    return result
+        result.add(named_object)
+    return list(result)
+
+def find_propers(sents):
+    propers = sorted(text_utils.find_proper(sents), key=lambda x:-len(x[1]))
+    return [model.NamedObject({x[0]}, {x[1]}) for x in propers]
 
 def analyze(sents, dictionaries):
 
@@ -24,6 +27,7 @@ def analyze(sents, dictionaries):
     directionprep_dictionary = text_utils.load_dictionary(dictionaries[2])
 
     named_objects = find_propers(sents)
+    named_objects_copy = named_objects[:]
 
     ret = []
     for named_object in named_objects:
@@ -41,18 +45,14 @@ def analyze(sents, dictionaries):
             named_objects.remove(named_object)
 
     for named_object in named_objects:
-        print("CO")
-        print(named_object.coordinates)
-        sentences = [s for s in sents if s[0] in named_object.coordinates]
-        print(" ".join(str(x) for x in sentences))
+        sentences = [s for s in enumerate(sents) if s[0] in named_object.coordinates]
         for i, s in sentences:
             for name in named_object.names:
                 if text_utils.get_word_before(s, " ".join(x for x in name)) in directionprep_dictionary:
-                    thing = Location()
+                    thing = model.Location()
                     thing.names.update(named_object.names)
                     thing.coordinates.update(named_object.coordinates)
                     ret.append(thing)
-                    named_objects.remove(named_object)
 
     print("\n".join(str(x) for x in ret))
 
