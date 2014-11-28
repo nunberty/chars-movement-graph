@@ -13,10 +13,7 @@ class NamedThing(NamedThingBase):
         return classifier.has_person_words(self.tokens)
 
     def is_location(self):
-        prep = _get_word_before(
-                self.context,
-                " ".join(self.tokens)
-            )
+        prep = _get_word_before(self.context, " ".join(self.tokens))
 
         return (classifier.has_locarion_words(self.tokens) or
                 classifier.is_directional_preposition(prep))
