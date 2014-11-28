@@ -11,7 +11,7 @@ def reduce_propers(propers):
     while propers:
         named_object = propers.pop()
         for another in copy:
-            if named_object.names.intersect(another.n):
+            if named_object.names.intersect(another.names):
                 named_object.union(another)
         result.add(named_object)
     return list(result)
