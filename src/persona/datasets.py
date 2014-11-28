@@ -6,7 +6,7 @@ from . import config
 
 
 def fetch_dataset(name):
-    """ Returns sentencses of the named dataset"""
+    """ Returns sentencses of the named dataset. """
     dataset_dir = config.DATASETS_DIR / name
     if not dataset_dir.exists():
         raise Exception("Can't find dataset {}".format(name))
