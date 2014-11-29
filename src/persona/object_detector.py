@@ -108,7 +108,7 @@ class WordClassifier(object):
     def is_location_word(self, word):
         return word.lower() in self._locations
 
-    def has_locarion_words(self, words):
+    def has_location_words(self, words):
         return any(self.is_location_word(w) for w in words)
 
     def is_stop_word(self, word):
