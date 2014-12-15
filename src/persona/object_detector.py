@@ -15,7 +15,7 @@ class NamedThing(NamedThingBase):
     def is_location(self):
         prep = _get_word_before(self.context, " ".join(self.tokens))
 
-        return (classifier.has_locarion_words(self.tokens) or
+        return (classifier.has_location_words(self.tokens) or
                 classifier.is_directional_preposition(prep))
 
 class Entity(object):
@@ -49,7 +49,7 @@ class Entity(object):
         return self.canonical_name
 
 
-def analyze(sents):
+def analyze(names, sents):
     named_things = [(n_s, thing)
         for n_s, sentence in enumerate(sents)
         for thing in _find_named_things(sentence)

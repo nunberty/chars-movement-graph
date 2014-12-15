@@ -30,8 +30,7 @@ def fetch_character_list(book_name):
     url += name[0] + '/' + name + '/character-list'
     page = urllib.request.urlopen(url)
     soup = bs4.BeautifulSoup(page.read().decode('utf8'))
-    ret = [next(x.children).text for x in soup.select('.litNoteText')]
-    print("\n".join(ret))
+    return [next(x.children).text for x in soup.select('.litNoteText')]
 
 def _fb2_to_sents(file_path, tokenizer):
     tree = ET.parse(str(file_path))
