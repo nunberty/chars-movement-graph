@@ -3,6 +3,8 @@ chars-movement-graph
 
 It's a course project at Saint Petersburg Academic University.
 
-How To Build
+FIX ME
 ============
-Python 3 and initialize __prefix__ variable in src/local_path.py file.
+* how to build
+* requirements
+* task and solution summary
