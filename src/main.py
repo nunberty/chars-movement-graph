@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 from persona import datasets, object_detector
 
-
 def main():
     title, sents = datasets.fetch_dataset('5')
     names = datasets.fetch_character_list(title)
