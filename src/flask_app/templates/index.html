@@ -28,30 +28,29 @@ Persona
       <img alt="Alice in wonderland"
       src="{{ url_for('static', filename='alice.png') }}" />
     </div>
-
     <div class="col-md-6">
       <p class="text-info">
         Upload a story in any reasonable format to get and interactive graph of
         character movements
       </p>
 
-      <form class="form-horizontal" role="form">
+      <form class="form-horizontal" enctype="multipart/form-data" method="post" role="form">
         <div class="form-group">
           <label for="storyInput" class="col-sm-3">Your story:</label>
           <div class="col-sm-6">
-            <input type="file" id="storyInput">
-            <p class="help-block">Supported formats: fb2</p>
+            <input type="file" name="file" id="storyInput">
+            <p class="help-block">Supported formats: {{ supported_formats }}</p>
           </div>
         </div>
 
         <button type="submit" class="btn btn-primary btn-block go-btn">Go!</button>
       </form>
     </div>
-
     <div class="col-md-3 hidden-xs">
       <img alt="Moomins"
       src="{{ url_for('static', filename='moomin.jpg') }}" />
     </div>
 
+    {{ filename }}
   </div>
 {% endblock %}
