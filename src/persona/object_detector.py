@@ -57,10 +57,14 @@ class Entity(object):
 
 class Base():
     def __init__(self, entity):
-        self.entity = entity
+        self._entity = entity
 
     def __str__(self):
-        return self.entity.canonical_name
+        return self._entity.canonical_name
+
+    @property
+    def positions(self):
+        return self._enttiy._positions = [position]
 
 class Person(Base):
     pass
@@ -169,4 +173,11 @@ class WordClassifier(object):
 classifier = WordClassifier()
 
 def generate_schema(persons, locations):
-    pass
+    coortinates = []
+    for p in persons:
+        for l in locations:
+            for i in set(p.positions) & set(l.positions):
+                coordinates.append((i, l, p))
+
+
+    return coordinates
