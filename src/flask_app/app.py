@@ -10,16 +10,12 @@ def create_app():
 app = create_app()
 
 @app.route('/')
-def hello_world():
-    return 'Hello world!'
+def index():
+    return render_template('index.html')
 
-@app.route('/bye/')
-def good_bye():
-    return 'Good bye!'
-
-@app.route('/hello/<name>')
-def say_hello(name=None):
-    return render_template('hello.html', name=name)
+@app.route('/<book_name>')
+def book_info(book_name=None):
+    return render_template('book_info.html', book_name=book_name)
 
 if __name__=='__main__':
     app.run(debug=True)
