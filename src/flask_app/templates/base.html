@@ -1,8 +1,16 @@
 <!doctype html>
 {% extends "bootstrap/base.html" %}
 
-{% block content %}
+{% block scripts %}
+{{super()}}
+<script>
+    URLS = {
+        api: "{{ url_for("api") }}"
+    };
+</script>
+{% endblock %}
 
+{% block content %}
 <div class="page-header text-center">
   <h1>Persona. <small>Trace you characters!</small></h1>
 </div>

@@ -1,9 +1,10 @@
 from persona import datasets, object_detector
 from flask import (Flask, render_template, request, redirect,
-                    send_from_directory, url_for)
+                    send_from_directory, url_for, Response)
 from werkzeug import secure_filename
 from flask_bootstrap import Bootstrap
 import os
+import json
 
 UPLOAD_FOLDER = '/home/alina/test/'
 ALLOWED_EXTENSIONS = {'fb2'}
@@ -42,7 +43,13 @@ def index(filename=None):
 def uploaded_file(filename):
     return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 
-@app.route('/<book_name>')
+@app.route('/api/')
+def api():
+    data = {"xs": [100, 4, 8, 16]}
+    resp = Response(json.dumps(data), status=200, mimetype='application/json')
+    return resp
+
+@app.route('/schema/<book_name>')
 def book_info(book_name=None):
     return render_template('book_info.html', book_name=book_name)
 
