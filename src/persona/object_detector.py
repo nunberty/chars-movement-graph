@@ -28,6 +28,11 @@ class Entity(object):
         my_words = {x for t in self._names for x in t.tokens}
         return bool(thing_words & my_words)
 
+    def has_same_name(self, name):
+        print({' '.join(n.tokens) for n in self._names})
+        return any(name in ' '.join(n.tokens)
+            for n in self._names)
+
     def add_thing(self, thing, position):
         assert self.is_same_thing(thing)
         self._names.append(thing)
@@ -48,6 +53,18 @@ class Entity(object):
     def __str__(self):
         return self.canonical_name
 
+class Base():
+    def __init__(self, entity):
+        self.entity = entity
+
+    def __str__(self):
+        return self.entity.canonical_name
+
+class Person(Base):
+    pass
+
+class Location(Base):
+    pass
 
 def analyze(names, sents):
     named_things = [(n_s, thing)
@@ -55,7 +72,31 @@ def analyze(names, sents):
         for thing in _find_named_things(sentence)
     ]
     entities = _find_entities(named_things)
-    return entities
+    return _classify(names, entities)
+
+def _classify_entity(names, entity):
+    def is_person(entity):
+        return any(entity.has_same_name(name) for name in names)
+    is_person = is_person(entity)
+    is_location = entity.is_location
+    if is_person:
+        return Person(entity)
+    elif is_location:
+        return Location(entity)
+    else:
+        return None
+
+def _classify(names, entities):
+    locations = []
+    persons = []
+    for e in entities:
+        classified_entity = _classify_entity(names, e)
+        if classified_entity:
+            add_to = persons if isinstance(classified_entity, Person) else locations
+            add_to.append(classified_entity)
+    print(names)
+    print([str(x) for x in persons])
+    return persons, locations
 
 def _find_entities(named_things):
     entities = set()
