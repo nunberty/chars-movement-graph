@@ -1,6 +1,12 @@
 <!doctype html>
 {% extends "bootstrap/base.html" %}
 
+{% block styles %}
+{{super()}}
+<link rel="stylesheet"
+href="{{url_for('static', filename='style.css')}}">
+{% endblock %}
+
 {% block scripts %}
 {{super()}}
 <script>
@@ -15,7 +21,7 @@
   <h1>Persona. <small>Trace you characters!</small></h1>
 </div>
 
-<div class="conteiner">
+<div class="container">
   {% block main_content %}
       Hello. World!!!
   {% endblock %}

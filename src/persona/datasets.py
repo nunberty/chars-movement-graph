@@ -13,9 +13,9 @@ def fetch_dataset(name):
         raise Exception("Can't find dataset {}".format(name))
     dataset_file = dataset_dir / "{}.fb2".format(name)
     tokenizer = _load_tokenizer('english')
-    return _get_book_name(dataset_file), _fb2_to_sents(dataset_file, tokenizer)
+    return _fb2_to_sents(dataset_file, tokenizer)
 
-def _get_book_name(dataset_file):
+def get_book_name(dataset_file):
     """ Returns book title of the dataset file """
     title_path = 'description/title-info/book-title'
     tree = ET.parse(str(dataset_file))

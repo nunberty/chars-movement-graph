@@ -9,9 +9,14 @@
 
 {% block main_content %}
 
-<div class="test">X</div>
-<div class="test">X</div>
-<div class="test">X</div>
-<div class="test">X</div>
-
+<div class="row">
+    <div class="col-md-3">
+        {{ title }}
+        <ul>
+            {% for character in characters %}
+            <li>{{ character }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
 {% endblock %}

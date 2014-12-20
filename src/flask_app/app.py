@@ -21,27 +21,21 @@ def allowed_file(filename):
             filename.split('.')[1] in ALLOWED_EXTENSIONS
     )
 
-@app.route('/<filename>', endpoint='with_filename')
 @app.route('/', methods=['GET', 'POST'], endpoint='index')
 def index(filename=None):
     if request.method == 'POST':
-        print(request)
-        print(request.files)
         file = request.files['file']
         if file and allowed_file(file.filename):
             filename = secure_filename(file.filename)
-            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-            print(filename)
-            return redirect(url_for('with_filename', filename=filename))
+            file.save(path_to_file(filename))
+            return redirect(url_for('schema', filename=filename))
     return render_template(
         'index.html',
-        filename=filename,
         supported_formats=','.join(sorted(ALLOWED_EXTENSIONS))
     )
 
-@app.route('/uploads/<filename>')
-def uploaded_file(filename):
-    return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
+def path_to_file(filename):
+    return os.path.join(app.config['UPLOAD_FOLDER'], filename)
 
 @app.route('/api/')
 def api():
@@ -49,9 +43,16 @@ def api():
     resp = Response(json.dumps(data), status=200, mimetype='application/json')
     return resp
 
-@app.route('/schema/<book_name>')
-def book_info(book_name=None):
-    return render_template('book_info.html', book_name=book_name)
+@app.route('/<filename>')
+def schema(filename):
+    path = path_to_file(filename)
+    title = datasets.get_book_name(path)
+    characters = datasets.fetch_character_list(title)
+
+    return render_template('schema.html',
+        title=title,
+        characters=characters
+    )
 
 if __name__=='__main__':
     app.run(debug=True)
