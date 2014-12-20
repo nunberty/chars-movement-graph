@@ -16,12 +16,14 @@ def fetch_dataset(name):
     return _get_book_name(dataset_file), _fb2_to_sents(dataset_file, tokenizer)
 
 def _get_book_name(dataset_file):
+    """ Returns book title of the dataset file """
     title_path = 'description/title-info/book-title'
     tree = ET.parse(str(dataset_file))
     for description in tree.getroot().findall(title_path):
         return description.text
 
 def fetch_character_list(book_name):
+    """ Returns list of character named by book title """
     def prepare_book_name(book_name):
         return '-'.join(book_name.split())
 
@@ -33,6 +35,7 @@ def fetch_character_list(book_name):
     return [next(x.children).text for x in soup.select('.litNoteText')]
 
 def _fb2_to_sents(file_path, tokenizer):
+    """ Returns list of sentences by file and tokenizer """
     tree = ET.parse(str(file_path))
     sents = []
     for body in tree.find('body'):
@@ -42,4 +45,5 @@ def _fb2_to_sents(file_path, tokenizer):
     return sents
 
 def _load_tokenizer(language):
+    """ Returns pickle tokenizer by language """
     return nltk.data.load('tokenizers/punkt/{}.pickle'.format(language))
