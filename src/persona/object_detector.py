@@ -2,8 +2,12 @@ import sys
 import itertools
 import collections
 import nltk
+from nltk.metrics.distance import edit_distance
 
 from . import config
+
+def compare_names(first, second):
+    return edit_distance(first, second) / min(len(first), len(second)) < 0.3
 
 NamedThingBase = collections.namedtuple('BaseNamedThing', ['tokens', 'context'])
 
@@ -28,13 +32,7 @@ class Entity(object):
         return bool(thing_words & my_words)
 
     def has_same_name(self, name):
-        def exclude_punctuation(data):
-            import string
-            exclude = set(string.punctuation)
-            return ''.join(c for c in data if c not in exclude)
-
-        print({' '.join(n.tokens) for n in self._names})
-        return any(name in ' '.join(n.tokens)
+        return any(compare_names(name, ' '.join(n.tokens))
             for n in self._names)
 
     def add_thing(self, thing, position):
@@ -79,9 +77,12 @@ def analyze(names, sents):
     return _classify(names, entities)
 
 def _classify_entity(names, entity):
+    """ Returns tuple of persons and location lists """
     def is_person(entity):
         return any(entity.has_same_name(name) for name in names)
     is_person = is_person(entity)
+    print(is_person, entity.canonical_name)
+    print('===')
     is_location = entity.is_location
     if is_person:
         return Person(entity)

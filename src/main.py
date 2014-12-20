@@ -5,7 +5,7 @@ def main():
     title, sents = datasets.fetch_dataset('5')
     names = datasets.fetch_character_list(title)
     persons, locations = object_detector.analyze(names, sents)
-
+    #
     # print("\tLOCATIONS:\n")
     # for l in locations:
     #     print(l)
