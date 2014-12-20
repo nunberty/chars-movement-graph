@@ -15,6 +15,10 @@ def fetch_dataset(name):
     tokenizer = _load_tokenizer('english')
     return _fb2_to_sents(dataset_file, tokenizer)
 
+def fetch_file(path):
+    tokenizer = _load_tokenizer('english')
+    return _fb2_to_sents(path, tokenizer)
+
 def get_book_name(dataset_file):
     """ Returns book title of the dataset file """
     title_path = 'description/title-info/book-title'

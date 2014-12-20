@@ -48,6 +48,8 @@ def schema(filename):
     path = path_to_file(filename)
     title = datasets.get_book_name(path)
     characters = datasets.fetch_character_list(title)
+    sentences = datasets.fetch_file(path_to_file(filename))
+    persons, locations = object_detector.analyze(characters, sentences)
 
     return render_template('schema.html',
         title=title,

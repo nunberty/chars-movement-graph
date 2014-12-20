@@ -167,3 +167,6 @@ class WordClassifier(object):
         return word.lower() in self._directionprep
 
 classifier = WordClassifier()
+
+def generate_schema(persons, locations):
+    pass
