@@ -1,12 +1,18 @@
-from persona import datasets, object_detector
+import itertools
+import os
+import json
+import functools
+
 from flask import (Flask, render_template, request, redirect,
                     send_from_directory, url_for, Response)
 from werkzeug import secure_filename
 from flask_bootstrap import Bootstrap
-import os
-import json
 
-UPLOAD_FOLDER = '/home/alina/test/'
+from persona import datasets, object_detector
+
+
+
+UPLOAD_FOLDER = '/tmp'
 ALLOWED_EXTENSIONS = {'fb2'}
 
 def create_app():
@@ -37,23 +43,70 @@ def index(filename=None):
 def path_to_file(filename):
     return os.path.join(app.config['UPLOAD_FOLDER'], filename)
 
-@app.route('/api/')
-def api():
-    data = {"xs": [100, 4, 8, 16]}
+class BookInfo(object):
+    def __init__(self, filename):
+        self.filename = filename
+        self._cache = None
+
+    @property
+    def title(self):
+        return datasets.get_book_name(self._path)
+
+    @property
+    def visits(self):
+        return [(i, str(l), str(p)) for i, l, p in
+                object_detector.generate_schema(*self._persons_locations)]
+
+    @property
+    def persons(self):
+        return [str(x) for x in self._persons_locations[0]]
+
+    @property
+    def locations(self):
+        return [str(x) for x in self._persons_locations[1]]
+
+    @property
+    def _persons_locations(self):
+        if self._cache is None:
+            characters = datasets.fetch_character_list(self.title)
+            sentences = datasets.fetch_file(self._path)
+            persons, locations = object_detector.analyze(characters, sentences)
+            self._cache = persons, locations
+        return self._cache
+
+    @property
+    def _path(self):
+        return path_to_file(self.filename)
+
+@app.route('/api/<filename>')
+def api(filename):
+    bi = BookInfo(filename)
+    locations = bi.locations
+    groups = []
+    for k, g in itertools.groupby(sorted(bi.visits), lambda x: x[0]):
+        persons_for_loc = [[] for _ in locations]
+        for (_, l, p) in g:
+            for ll, ps in zip(locations, persons_for_loc):
+                if l == ll:
+                    ps.append(p)
+
+        groups.append(persons_for_loc)
+
+    data = {
+        'title': bi.title,
+        'persons': bi.persons,
+        'locations': locations,
+        'visits': groups
+    }
     resp = Response(json.dumps(data), status=200, mimetype='application/json')
     return resp
 
 @app.route('/<filename>')
 def schema(filename):
-    path = path_to_file(filename)
-    title = datasets.get_book_name(path)
-    characters = datasets.fetch_character_list(title)
-    sentences = datasets.fetch_file(path_to_file(filename))
-    persons, locations = object_detector.analyze(characters, sentences)
-
+    bi = BookInfo(filename)
     return render_template('schema.html',
-        title=title,
-        characters=characters
+                           title=bi.title,
+                           filename=filename
     )
 
 if __name__=='__main__':

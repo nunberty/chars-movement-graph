@@ -64,7 +64,7 @@ class Base():
 
     @property
     def positions(self):
-        return self._enttiy._positions = [position]
+        return self._entity._positions
 
 class Person(Base):
     pass
@@ -173,11 +173,10 @@ class WordClassifier(object):
 classifier = WordClassifier()
 
 def generate_schema(persons, locations):
-    coortinates = []
+    coordinates = []
     for p in persons:
         for l in locations:
             for i in set(p.positions) & set(l.positions):
                 coordinates.append((i, l, p))
-
 
     return coordinates

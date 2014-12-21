@@ -2,9 +2,15 @@
 {% extends "base.html" %}
 
 {% block scripts %}
-{{super()}}
-<script src="{{ url_for('static', filename='js/graph.js')}}"> </script>
-<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+  {{super()}}
+  <script>
+   URLS = {
+     api: "{{ url_for('api', filename=filename) }}"
+   };
+  </script>
+
+  <script src="{{ url_for('static', filename='js/graph.js')}}"> </script>
+  <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
 {% endblock %}
 
 {% block main_content %}
@@ -12,11 +18,15 @@
 <div class="row">
     <div class="col-md-3">
         {{ title }}
-        <ul>
-            {% for character in characters %}
-            <li>{{ character }}</li>
-            {% endfor %}
+        <ul class="character-list">
         </ul>
+    </div>
+    <div class="col-md-9">
+
+      <div class="graph">
+        Loading...
+      </div>
+
     </div>
 </div>
 {% endblock %}

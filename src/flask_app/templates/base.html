@@ -7,15 +7,6 @@
 href="{{url_for('static', filename='style.css')}}">
 {% endblock %}
 
-{% block scripts %}
-{{super()}}
-<script>
-    URLS = {
-        api: "{{ url_for("api") }}"
-    };
-</script>
-{% endblock %}
-
 {% block content %}
 <div class="page-header text-center">
   <h1>Persona. <small>Trace you characters!</small></h1>

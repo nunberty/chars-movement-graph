@@ -6,3 +6,20 @@
   height: 30px;
   background-color: #f5f5f5;
 }
+
+.location-legend {
+  position: absolute;
+}
+
+.point {
+  position: absolute;
+}
+
+.location {
+  /* border: solid 1px steelblue; */
+  position: absolute;
+}
+
+.graph {
+  position: relative;
+}
