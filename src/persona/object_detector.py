@@ -85,8 +85,6 @@ def _classify_entity(names, entity):
     def is_person(entity):
         return any(entity.has_same_name(name) for name in names)
     is_person = is_person(entity)
-    print(is_person, entity.canonical_name)
-    print('===')
     is_location = entity.is_location
     if is_person:
         return Person(entity)
@@ -103,8 +101,6 @@ def _classify(names, entities):
         if classified_entity:
             add_to = persons if isinstance(classified_entity, Person) else locations
             add_to.append(classified_entity)
-    print(names)
-    print([str(x) for x in persons])
     return persons, locations
 
 def _find_entities(named_things):

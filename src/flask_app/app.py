@@ -71,7 +71,8 @@ class BookInfo(object):
             characters = datasets.fetch_character_list(self.title)
             sentences = datasets.fetch_file(self._path)
             persons, locations = object_detector.analyze(characters, sentences)
-            self._cache = persons, locations
+            self._cache = (sorted(persons, key=lambda x: str(x)),
+                           sorted(locations, key=lambda x: str(x)))
         return self._cache
 
     @property
@@ -81,22 +82,37 @@ class BookInfo(object):
 @app.route('/api/<filename>')
 def api(filename):
     bi = BookInfo(filename)
-    locations = bi.locations
+    position_f = lambda x: x[0]
+    location_f = lambda x: x[1]
+    pearson_f = lambda x: x[2]
+
+    visits = sorted(bi.visits, key=position_f)
+    # visits = [v for v in visits if v[2] == "Mrs. Jones"]
+    position_index = {p: i for (i, p) in
+                      enumerate(sorted({x for (x, _, _) in visits}))}
+    locations_index = {l: i for (i, l) in enumerate(bi.locations)}
+    person_index = {p: i for (i, p) in enumerate(bi.persons)}
     groups = []
-    for k, g in itertools.groupby(sorted(bi.visits), lambda x: x[0]):
-        persons_for_loc = [[] for _ in locations]
+    for _, g in itertools.groupby(visits, position_f):
+        persons_for_loc = [[] for _ in bi.locations]
         for (_, l, p) in g:
-            for ll, ps in zip(locations, persons_for_loc):
-                if l == ll:
-                    ps.append(p)
+            persons_for_loc[locations_index[l]].append(p)
 
         groups.append(persons_for_loc)
+
+    transitions = [[] for p in bi.persons]
+    for p, g in itertools.groupby(sorted(visits, key=pearson_f), pearson_f):
+        locs = [{'position': position_index[pos], 'location': locations_index[l]}
+                for (pos, l, _) in sorted(g, key=position_f)]
+        for l1, l2 in zip(locs, locs[1:]):
+            transitions[person_index[p]].append((l1, l2))
 
     data = {
         'title': bi.title,
         'persons': bi.persons,
-        'locations': locations,
-        'visits': groups
+        'locations': bi.locations,
+        'visits': groups,
+        'transitions': transitions
     }
     resp = Response(json.dumps(data), status=200, mimetype='application/json')
     return resp
