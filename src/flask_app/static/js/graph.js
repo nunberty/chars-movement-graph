@@ -2,7 +2,8 @@ $(function(){
     var cell_w = 20;
     var cell_h = 20;
 
-    var on_data = function(data) {
+    var on_data = function(error, data) {
+        if (error) { alert("oups"); }
         console.log('...done!');
         render_characters(data.persons);
         render_graph(data.visits, data.locations);

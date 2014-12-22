@@ -19,21 +19,29 @@ class NamedThing(NamedThingBase):
         prep = _get_word_before(self.context, " ".join(self.tokens))
 
         return (classifier.has_location_words(self.tokens) or
-                classifier.is_directional_preposition(prep))
+                classifier.is_directional_preposition(prep) and
+                not classifier.has_person_words(self.tokens))
 
 class Entity(object):
     def __init__(self, name, position):
         self._names = [name]
         self._positions = [position]
+        self._canonical_name = None
+        self._is_person = False
 
     def is_same_thing(self, thing):
-        thing_words = set(thing.tokens)
-        my_words = {x for t in self._names for x in t.tokens}
-        return bool(thing_words & my_words)
+        def meaningful(x): return len(x) > 2
+        thing_words = {x for x in thing.tokens if meaningful(x)}
+        my_words = {x for t in self._names for x in t.tokens if meaningful(x)}
+        return any(compare_names(a, b) for a in thing_words for b in my_words)
 
     def has_same_name(self, name):
-        return any(compare_names(name, ' '.join(n.tokens))
+        ret = any(compare_names(name, ' '.join(n.tokens))
             for n in self._names)
+        if ret:
+            self._canonical_name = name
+            self._is_person = ret
+        return ret
 
     def add_thing(self, thing, position):
         assert self.is_same_thing(thing)
@@ -42,7 +50,7 @@ class Entity(object):
 
     @property
     def is_person(self):
-        return any(name.is_person() for name in self._names)
+        return self._is_person or any(name.is_person() for name in self._names)
 
     @property
     def is_location(self):
@@ -50,6 +58,8 @@ class Entity(object):
 
     @property
     def canonical_name(self):
+        if self._canonical_name:
+            return self._canonical_name
         return " ".join(max(self._names, key=lambda n: len(n.tokens)).tokens)
 
     def __str__(self):
@@ -104,14 +114,14 @@ def _classify(names, entities):
     return persons, locations
 
 def _find_entities(named_things):
-    entities = set()
+    entities = []
     for position, thing in named_things:
         for e in entities:
             if e.is_same_thing(thing):
                 e.add_thing(thing, position)
                 break
         else:
-            entities.add(Entity(thing, position))
+            entities.append(Entity(thing, position))
     return entities
 
 def _find_named_things(sentence):

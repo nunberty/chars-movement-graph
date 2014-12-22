@@ -54,26 +54,24 @@ class BookInfo(object):
 
     @property
     def visits(self):
-        return [(i, str(l), str(p)) for i, l, p in
-                object_detector.generate_schema(*self._persons_locations)]
-
-    @property
-    def persons(self):
-        return [str(x) for x in self._persons_locations[0]]
-
-    @property
-    def locations(self):
-        return [str(x) for x in self._persons_locations[1]]
-
-    @property
-    def _persons_locations(self):
         if self._cache is None:
             characters = datasets.fetch_character_list(self.title)
             sentences = datasets.fetch_file(self._path)
             persons, locations = object_detector.analyze(characters, sentences)
-            self._cache = (sorted(persons, key=lambda x: str(x)),
-                           sorted(locations, key=lambda x: str(x)))
+            persons = sorted(persons, key=lambda x: str(x))
+            locations = sorted(locations, key=lambda x: str(x))
+            self._cache = [(i, str(l), str(p)) for i, l, p in
+                            object_detector.generate_schema(persons, locations)]
+
         return self._cache
+
+    @property
+    def persons(self):
+        return sorted({p for (_, _, p) in self.visits})
+
+    @property
+    def locations(self):
+        return sorted({l for (_, l, _) in self.visits})
 
     @property
     def _path(self):
