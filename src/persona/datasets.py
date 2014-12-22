@@ -5,6 +5,7 @@ import urllib
 import bs4
 
 from . import config
+from . import fb2_to_xml
 
 def fetch_dataset(name):
     """ Returns sentencses of the named dataset. """
@@ -22,6 +23,7 @@ def fetch_file(path):
 def get_book_name(dataset_file):
     """ Returns book title of the dataset file """
     title_path = 'description/title-info/book-title'
+    fb2_to_xml.prepare_file(dataset_file)
     tree = ET.parse(str(dataset_file))
     for description in tree.getroot().findall(title_path):
         return description.text

@@ -68,6 +68,10 @@ class BookInfo(object):
     @property
     def _persons_locations(self):
         if self._cache is None:
+            print("")
+            print(self.title)
+            print("")
+
             characters = datasets.fetch_character_list(self.title)
             sentences = datasets.fetch_file(self._path)
             persons, locations = object_detector.analyze(characters, sentences)
